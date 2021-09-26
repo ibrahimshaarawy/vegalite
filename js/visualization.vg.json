@@ -1,0 +1,85 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v5.json",
+  "background": "white",
+  "padding": 5,
+  "width": 800,
+  "height": 600,
+  "title": {"text": "Ibrahim Shaarawy Homework Week 10", "frame": "group"},
+  "data": [
+    {
+      "name": "source_0",
+      "url": "https://raw.githubusercontent.com/ibrahimshaarawy/vegalite/main/custom.geo-3-2.json",
+      "format": {"type": "topojson", "feature": "custom.geo-3", "parse": {}},
+      "transform": [
+        {
+          "type": "formula",
+          "expr": "datum[\"properties\"] && datum[\"properties\"][\"pop_est\"]",
+          "as": "properties.pop_est"
+        },
+        {
+          "type": "formula",
+          "expr": "datum[\"properties\"] && datum[\"properties\"][\"name\"]",
+          "as": "properties.name"
+        },
+        {
+          "type": "formula",
+          "expr": "datum[\"properties\"] && datum[\"properties\"][\"gdp_md_est\"]",
+          "as": "properties.gdp_md_est"
+        },
+        {
+          "type": "filter",
+          "expr": "isValid(datum[\"properties.pop_est\"]) && isFinite(+datum[\"properties.pop_est\"])"
+        }
+      ]
+    }
+  ],
+  "projections": [
+    {
+      "name": "projection",
+      "size": {"signal": "[width, height]"},
+      "fit": {"signal": "data('source_0')"},
+      "type": "equalEarth"
+    }
+  ],
+  "marks": [
+    {
+      "name": "layer_0_layer_0_marks",
+      "type": "shape",
+      "style": ["geoshape"],
+      "from": {"data": "source_0"},
+      "encode": {
+        "update": {
+          "stroke": {"value": "#757575"},
+          "strokeWidth": {"value": 0.5},
+          "fill": {"scale": "color", "field": "properties\\.pop_est"},
+          "tooltip": {
+            "signal": "{\"Name\": isValid(datum[\"properties.name\"]) ? datum[\"properties.name\"] : \"\"+datum[\"properties.name\"], \"Est. Median GDP\": format(datum[\"properties.gdp_md_est\"], \",\"), \"Est. Population\": format(datum[\"properties.pop_est\"], \",\")}"
+          },
+          "ariaRoleDescription": {"value": "geoshape"},
+          "description": {
+            "signal": "\"properties.pop_est: \" + (format(datum[\"properties.pop_est\"], \",\")) + \"; Name: \" + (isValid(datum[\"properties.name\"]) ? datum[\"properties.name\"] : \"\"+datum[\"properties.name\"]) + \"; Est. Median GDP: \" + (format(datum[\"properties.gdp_md_est\"], \",\")) + \"; Est. Population: \" + (format(datum[\"properties.pop_est\"], \",\"))"
+          }
+        }
+      },
+      "transform": [{"type": "geoshape", "projection": "projection"}]
+    }
+  ],
+  "scales": [
+    {
+      "name": "color",
+      "type": "linear",
+      "domain": {"data": "source_0", "field": "properties\\.pop_est"},
+      "range": {"scheme": "Oranges"},
+      "interpolate": "hcl",
+      "zero": false
+    }
+  ],
+  "legends": [
+    {
+      "format": ",",
+      "title": "Population Estimates",
+      "fill": "color",
+      "gradientLength": {"signal": "clamp(height, 64, 200)"}
+    }
+  ]
+}
